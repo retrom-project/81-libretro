@@ -10,6 +10,7 @@ trap 'rm -rf "$work"' EXIT INT TERM
 mkdir -p "$work/raw" "$work/build"
 make -C "$root" -f Makefile.libretro platform=unix -j4 > "$work/native-build.log" 2>&1
 python3 "$root/.github/rpg-runtime/test-controller-load.py" "$root/81_libretro.so"
+python3 "$root/.github/rpg-runtime/test-controller-load.py" "$root/81_libretro.so" --no-bitmasks
 source_digest=$(python3 "$root/.github/rpg-runtime/candidate_descriptor.py" digest "$output")
 python3 "$root/.github/rpg-runtime/candidate_descriptor.py" paths "$output" > "$work/source-files"
 tar -C "$root" --null --verbatim-files-from -T "$work/source-files" -cf "$work/source.tar"

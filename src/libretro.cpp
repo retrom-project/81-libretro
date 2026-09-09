@@ -72,7 +72,21 @@ extern int WinR, WinL, WinT, WinB, WinRSM, WinLSM, WinTSM, WinBSM, WinRBN, WinLB
 extern WORD* TVFB;
 extern keybovl_t zx81ovl;
 
+// Compatibility with the bundled pre-bitmask libretro header.
+#ifndef RETRO_DEVICE_ID_JOYPAD_MASK
+#define RETRO_DEVICE_ID_JOYPAD_MASK 256
+#define RETRO_ENVIRONMENT_GET_INPUT_BITMASKS (51 | RETRO_ENVIRONMENT_EXPERIMENTAL)
+#endif
+
 static state_t state;
+static bool input_bitmasks;
+
+static int16_t controller_input(unsigned port, unsigned device, unsigned index, unsigned id)
+{
+  if (input_bitmasks && (device & RETRO_DEVICE_MASK) == RETRO_DEVICE_JOYPAD && id < 16)
+    return (uint16_t(input_state_cb(port, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK)) >> id) & 1;
+  return input_state_cb(port, device & RETRO_DEVICE_MASK, index, id);
+}
 
 #define ZX81KEYS "auto|default|new line|shift|space|.|0|1|2|3|4|5|6|7|8|9|a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z"
 
@@ -247,43 +261,43 @@ static int update_variables()
     const char* value;
     
     int option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_up", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_UP ] = option < 0 || option == 1 ? '7' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_UP ] = option <= 1 ? '7' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_down", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_DOWN ] = option < 0 || option == 1 ? '6' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_DOWN ] = option <= 1 ? '6' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_left", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_LEFT ] = option < 0 || option == 1 ? '5' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_LEFT ] = option <= 1 ? '5' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_right", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_RIGHT ] = option < 0 || option == 1 ? '8' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_RIGHT ] = option <= 1 ? '8' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_a", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_A ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_A ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_b", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_B ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_B ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_x", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_X ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_X ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_y", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_Y ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_Y ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_l", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_L ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_L ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_r", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_R ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_R ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_l2", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_L2 ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_L2 ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_r2", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_R2 ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_R2 ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
     
     option = coreopt( env_cb, core_vars, state.sha1, "81_joypad_start", &value );
-    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_START ] = option < 0 || option == 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
+    zx81ovl.joymap[ RETRO_DEVICE_ID_JOYPAD_START ] = option <= 1 ? '0' : option < 6 ? keys[ option ] : toupper( *value );
   }
   
   state.scaled = ( WinR - WinL ) == 640;
@@ -344,6 +358,7 @@ unsigned retro_api_version( void )
 
 void retro_init( void )
 {
+  input_bitmasks = env_cb(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL);
   struct retro_log_callback log;
 
   if ( env_cb( RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log ) )
@@ -524,7 +539,7 @@ void retro_run( void )
   uint16_t* fb = TVFB + WinL + WinT * TVP / 2;
   uint16_t* fbKeyb = TVFB + WinL + WinT * TVPKEYB / 2;  
   eo_tick();
-  keybovl_update( input_state_cb, state.devices, fbKeyb, TVP / 2, state.transp, state.scaled, state.ms, 20 );
+  keybovl_update( controller_input, state.devices, fbKeyb, TVP / 2, state.transp, state.scaled, state.ms, 20 );
   video_cb( (void*)fb, WinR - WinL, WinB - WinT, TVP );
 }
 
