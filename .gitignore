@@ -29,3 +29,6 @@
 
 bin/*
 version.c
+
+/.retrom-build/
+*.bc

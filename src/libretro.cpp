@@ -378,7 +378,12 @@ bool retro_load_game( const struct retro_game_info* info )
   log_cb( RETRO_LOG_INFO, "\n%s", eo_gitstamp );
 #endif
   
+  // Frontends may configure controller ports before loading content.
+  // Content reset must not erase those independently selected devices.
+  const unsigned devices[2] = { state.devices[0], state.devices[1] };
   memset( (void*)&state, 0, sizeof( state ) );
+  state.devices[0] = devices[0];
+  state.devices[1] = devices[1];
   state.size = info->size;
   state.data = malloc( info->size );
   
