@@ -234,7 +234,7 @@ static void update( retro_input_state_t input_cb, unsigned* devices, int ms )
       continue;
     }
     
-    if ( input_cb( p, devices[ p ], 0, RETRO_DEVICE_ID_JOYPAD_SELECT ) )
+    if ( input_cb( p, devices[ p ] & RETRO_DEVICE_MASK, 0, RETRO_DEVICE_ID_JOYPAD_SELECT ) )
     {
       if ( !select )
       {
@@ -264,7 +264,7 @@ static void update( retro_input_state_t input_cb, unsigned* devices, int ms )
         continue;
       }
       
-      int16_t  is_down = input_cb( p, devices[ p ], 0, i );
+      int16_t  is_down = input_cb( p, devices[ p ] & RETRO_DEVICE_MASK, 0, i );
       uint32_t bit = 1 << i;
       
       if ( !visible )
@@ -358,7 +358,7 @@ static void update( retro_input_state_t input_cb, unsigned* devices, int ms )
       
       for ( k = ovl->keys; k->id != 0xffff; k++ )
       {
-        int16_t  is_down = input_cb( p, devices[ p ], 0, k->retro );
+        int16_t  is_down = input_cb( p, devices[ p ] & RETRO_DEVICE_MASK, 0, k->retro );
         int      index = k->retro / 32;
         uint32_t bit = 1 << ( k->retro & 31 );
 

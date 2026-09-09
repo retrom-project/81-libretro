@@ -25,13 +25,13 @@ def poll():pass
 @C.CFUNCTYPE(C.c_int16,C.c_uint,C.c_uint,C.c_uint,C.c_uint)
 def inp(port,device,index,id):
  k=(port,device,id);pollcounts[k]=pollcounts.get(k,0)+1
- return int(pressed and port==0 and id==0 and device&255==1)
+ return int(pressed and port==0 and id==0 and device==1)
 lib.retro_set_environment(env);lib.retro_set_video_refresh(video);lib.retro_set_audio_sample_batch(audio);lib.retro_set_input_poll(poll);lib.retro_set_input_state(inp);lib.retro_init()
 b=bytes(512);data=C.create_string_buffer(b);g=Game(b'fixture.p',C.cast(data,C.c_void_p),len(b),None)
 lib.retro_set_controller_port_device(0,257);lib.retro_set_controller_port_device(1,259)
 lib.retro_load_game.argtypes=[C.POINTER(Game)];assert lib.retro_load_game(C.byref(g))
 for _ in range(3):lib.retro_run()
-assert pollcounts.get((0,257,0),0)>0, "configured joypad was cleared while loading content"
-assert pollcounts.get((1,259,13),0)>0, "independent keyboard was cleared while loading content"
+assert pollcounts.get((0,1,0),0)>0, "configured joypad must survive loading and query the base device"
+assert pollcounts.get((1,3,13),0)>0, "independent keyboard must survive loading and query the base device"
 lib.retro_deinit()
 print("preconfigured controller input survives content loading")
